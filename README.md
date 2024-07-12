@@ -1,1 +1,0 @@
-# ghdw1982.github.io
