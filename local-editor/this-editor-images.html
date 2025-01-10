@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Notepad with Save Button</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .editor-container {
+            width: 1080px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 5px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+        .toolbar button, .toolbar input {
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .content-editable {
+            margin: 20px;
+            width: 100%;
+            height: 1200px;
+            border: 2px solid black;
+            padding: 40px;
+            box-sizing: border-box;
+            font-size: 22px;
+            line-height: 1.8;
+            overflow-y: auto;
+            resize: both;
+            background-color: #fff;
+           // font-family: Gentium;
+           // font-family: Monaco;
+           // font-family: Merriweather;
+           // font-family: EB Garamond;
+           // font-family: Crimson Pro;
+           // font-family: Cardo;
+           // font-family: Charter;
+           // font-weight:  700;
+           // font-family: Courier New;
+            font-family: Harding Text Web;
+           //  font-family: Comic Sans MS;
+        }
+
+        .feedback {
+            margin-top: 5px;
+            color: green;
+            font-size: 14px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            padding: 5px 0;
+        }
+    </style>
+    <script src="html2canvas.min.js"></script>
+</head>
+<body>
+    <!-- Temporary Notes Editor -->
+    <div class="editor-container">
+        <h2>Temporary Notes</h2>
+        <div class="toolbar">
+           <div id="tempFeedback" class="feedback"></div>
+            <button id="saveTemp">Save Notes</button>
+            <button id="toggleSpellcheckTemp">Toggle Spellcheck</button>
+            <button id="clearTemp">Clear Notes</button>
+            <button id="screenshotTemp">Take Screenshot</button>
+            <button id="exportHtmlTemp">Export as HTML</button>
+            <button id="resizeTemp">Resize Editor</button>
+            <input type="number" id="fontSizeTemp" placeholder="Font Size" value="22" min="10" max="50">
+        </div>
+        <div id="tempNotes" class="content-editable" contenteditable="true" placeholder="Temporary notes..."></div>
+    </div>
+
+    <!-- Long-Term Notes Editor -->
+    <div class="editor-container">
+        <h2>Long-Term Notes</h2>
+
+        <div class="toolbar">
+            <div id="longTermFeedback" class="feedback"></div>
+            <button id="saveLongTerm">Save Notes</button>
+            <button id="toggleSpellcheckLongTerm">Toggle Spellcheck</button>
+            <button id="clearLongTerm">Clear Notes</button>
+            <button id="screenshotLongTerm">Take Screenshot</button>
+            <button id="exportHtmlLongTerm">Export as HTML</button>
+            <button id="resizeLongTerm">Resize Editor</button>
+            <input type="number" id="fontSizeLongTerm" placeholder="Font Size" value="22" min="10" max="50">
+        </div>
+        <div id="longTermNotes" class="content-editable" contenteditable="true" placeholder="Long-term notes..."></div>
+        <br /><br /><br /><br />
+    </div>
+
+    <script>
+        const tempEditor = document.getElementById('tempNotes');
+        const longTermEditor = document.getElementById('longTermNotes');
+        const saveTempButton = document.getElementById('saveTemp');
+        const saveLongTermButton = document.getElementById('saveLongTerm');
+        const clearTempButton = document.getElementById('clearTemp');
+        const clearLongTermButton = document.getElementById('clearLongTerm');
+        const toggleSpellcheckTempButton = document.getElementById('toggleSpellcheckTemp');
+        const toggleSpellcheckLongTermButton = document.getElementById('toggleSpellcheckLongTerm');
+        const screenshotTempButton = document.getElementById('screenshotTemp');
+        const screenshotLongTermButton = document.getElementById('screenshotLongTerm');
+        const resizeTempButton = document.getElementById('resizeTemp');
+        const resizeLongTermButton = document.getElementById('resizeLongTerm');
+        const fontSizeTemp = document.getElementById('fontSizeTemp');
+        const fontSizeLongTerm = document.getElementById('fontSizeLongTerm');
+        const exportHtmlTempButton = document.getElementById('exportHtmlTemp');
+        const exportHtmlLongTermButton = document.getElementById('exportHtmlLongTerm');
+
+        // Load saved content from localStorage
+        tempEditor.innerHTML = localStorage.getItem('tempNotes') || '';
+        longTermEditor.innerHTML = localStorage.getItem('longTermNotes') || '';
+
+saveTempButton.addEventListener('click', () => {
+    localStorage.setItem('tempNotes', tempEditor.innerHTML);
+    document.getElementById('tempFeedback').innerText = 'saved!';
+    setTimeout(() => {
+        document.getElementById('tempFeedback').innerText = '';
+    }, 3000); // Clear after 3 seconds
+});
+
+saveLongTermButton.addEventListener('click', () => {
+    localStorage.setItem('longTermNotes', longTermEditor.innerHTML);
+    document.getElementById('longTermFeedback').innerText = 'saved!';
+    setTimeout(() => {
+        document.getElementById('longTermFeedback').innerText = '';
+    }, 3000); // Clear after 3 seconds
+});
+
+
+        // Clear the temporary notes
+        clearTempButton.addEventListener('click', () => {
+            localStorage.removeItem('tempNotes');
+            tempEditor.innerHTML = ''; // Clear the editor as well
+        });
+
+        // Clear the long-term notes
+        clearLongTermButton.addEventListener('click', () => {
+            localStorage.removeItem('longTermNotes');
+            longTermEditor.innerHTML = ''; // Clear the editor as well
+        });
+
+        // Toggle spellcheck for Temporary Notes
+        toggleSpellcheckTempButton.addEventListener('click', () => {
+            tempEditor.spellcheck = !tempEditor.spellcheck;
+           // alert(`Spellcheck for Temporary Notes is now ${tempEditor.spellcheck ? 'ON' : 'OFF'}.`);
+    // changed this
+    document.getElementById('tempFeedback').innerText = `spellcheck ${tempEditor.spellcheck ? 'ON' : 'OFF'}.`;
+
+    setTimeout(() => {
+        document.getElementById('tempFeedback').innerText = '';
+    }, 3000); // Clear after 3 seconds
+
+        });
+
+        // Toggle spellcheck for Long-Term Notes
+        toggleSpellcheckLongTermButton.addEventListener('click', () => {
+            longTermEditor.spellcheck = !longTermEditor.spellcheck;
+            alert(`Spellcheck for Long-Term Notes is now ${longTermEditor.spellcheck ? 'ON' : 'OFF'}.`);
+        });
+
+        // Take screenshot of the Temporary Notes editor
+        screenshotTempButton.addEventListener('click', () => {
+            html2canvas(tempEditor).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'temporary_notes_screenshot.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+
+        // Take screenshot of the Long-Term Notes editor
+        screenshotLongTermButton.addEventListener('click', () => {
+            html2canvas(longTermEditor).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'long_term_notes_screenshot.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+
+        // Export Temporary Notes as HTML
+        exportHtmlTempButton.addEventListener('click', () => {
+            const htmlContent = `<html><body><div>${tempEditor.innerHTML}</div></body></html>`;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.download = 'temporary_notes.html';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        });
+
+        // Export Long-Term Notes as HTML
+        exportHtmlLongTermButton.addEventListener('click', () => {
+            const htmlContent = `<html><body><div>${longTermEditor.innerHTML}</div></body></html>`;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.download = 'long_term_notes.html';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        });
+
+        // Resize editor to fit content
+        function resizeEditor(editor) {
+            editor.style.height = `${editor.scrollHeight + 20}px`;
+        }
+
+        // Resize Temporary Notes
+        resizeTempButton.addEventListener('click', () => {
+            resizeEditor(tempEditor);
+        });
+
+        // Resize Long-Term Notes
+        resizeLongTermButton.addEventListener('click', () => {
+            resizeEditor(longTermEditor);
+        });
+
+        // Change font size for Temporary Notes
+        fontSizeTemp.addEventListener('input', () => {
+            const fontSize = fontSizeTemp.value;
+            tempEditor.style.fontSize = fontSize + 'px';
+            localStorage.setItem('tempNotesFontSize', fontSize);
+        });
+
+        // Change font size for Long-Term Notes
+        fontSizeLongTerm.addEventListener('input', () => {
+            const fontSize = fontSizeLongTerm.value;
+            longTermEditor.style.fontSize = fontSize + 'px';
+            localStorage.setItem('longTermNotesFontSize', fontSize);
+        });
+
+        // Load saved font sizes from localStorage
+        const savedFontSizeTemp = localStorage.getItem('tempNotesFontSize');
+        const savedFontSizeLongTerm = localStorage.getItem('longTermNotesFontSize');
+        if (savedFontSizeTemp) {
+            tempEditor.style.fontSize = savedFontSizeTemp + 'px';
+            fontSizeTemp.value = savedFontSizeTemp;
+        }
+        if (savedFontSizeLongTerm) {
+            longTermEditor.style.fontSize = savedFontSizeLongTerm + 'px';
+            fontSizeLongTerm.value = savedFontSizeLongTerm;
+        }
+
+// Function to handle the drop event and insert images
+function handleDrop(event, editor) {
+    event.preventDefault();
+    
+    const files = event.dataTransfer.files;
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Check if the file is an image
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgElement = document.createElement('img');
+                imgElement.src = e.target.result;
+                imgElement.style.maxWidth = '100%'; // Ensure the image fits within the editor
+                imgElement.style.margin = '10px 0';
+                
+                // Insert the image at the current cursor position in the editor
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                range.deleteContents(); // Remove any selected text
+                range.insertNode(imgElement); // Insert the image
+                
+                // After inserting the image, move the cursor to the end
+                const newRange = document.createRange();
+                newRange.selectNodeContents(editor);
+                newRange.collapse(false); // Set the range to the end of the content
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            };
+            reader.readAsDataURL(file); // Read the image file as a DataURL
+        }
+    }
+}
+
+// Attach the event listener for drag and drop to both editors
+tempEditor.addEventListener('dragover', (event) => event.preventDefault()); // Prevent default to allow drop
+tempEditor.addEventListener('drop', (event) => handleDrop(event, tempEditor));
+
+longTermEditor.addEventListener('dragover', (event) => event.preventDefault()); // Prevent default to allow drop
+longTermEditor.addEventListener('drop', (event) => handleDrop(event, longTermEditor));
+
+
+    </script>
+</body>
+</html>

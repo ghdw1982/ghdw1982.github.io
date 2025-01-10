@@ -7,6 +7,4 @@ for the long-term  . . .
 
 and will be a work in progress.
 
-👍👍❤️‍🩹❤️‍🩹🌄🌄📓📓📚📚✅✅
-
 OK, bye
